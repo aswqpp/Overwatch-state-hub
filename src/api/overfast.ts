@@ -1,6 +1,6 @@
 import type { Filters, HeroStatRaw, HeroSummary, HeroDetail, MapInfo } from '@/types'
 
-const BASE = 'https://overfast-api.tekrop.fr'
+const BASE = import.meta.env.VITE_OVERFAST_BASE ?? '/api/overfast'
 
 class OverFastError extends Error {
   status: number
@@ -12,7 +12,7 @@ class OverFastError extends Error {
 }
 
 async function get<T>(path: string, params?: Record<string, string>): Promise<T> {
-  const url = new URL(`${BASE}${path}`)
+  const url = new URL(`${BASE}${path}`, window.location.origin)
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       if (v) url.searchParams.set(k, v)
