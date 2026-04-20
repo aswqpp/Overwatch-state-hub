@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 import type { Filters, Platform, Region, Rank } from '@/types'
 
 interface FilterStore extends Filters {
@@ -29,7 +30,9 @@ export const usePlatform = () => useFilterStore((s) => s.platform)
 export const useRegion = () => useFilterStore((s) => s.region)
 export const useRank = () => useFilterStore((s) => s.rank)
 export const useFilters = (): Filters =>
-  useFilterStore((s) => ({ platform: s.platform, region: s.region, rank: s.rank }))
+  useFilterStore(
+    useShallow((s) => ({ platform: s.platform, region: s.region, rank: s.rank })),
+  )
 
 // Needed for components
 export type { Platform, Region, Rank }
