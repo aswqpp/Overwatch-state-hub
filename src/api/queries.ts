@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchHeroStats, fetchHeroes, fetchHeroDetail, fetchMaps } from './overfast'
 import { computeHeroStats } from '@/utils/meta'
@@ -32,10 +33,13 @@ export function useHeroStats(overrideFilters?: Filters) {
   const isLoading = statsQuery.isLoading || heroesQuery.isLoading
   const error = statsQuery.error ?? heroesQuery.error
 
-  const heroStats =
-    statsQuery.data && heroesQuery.data
-      ? computeHeroStats(statsQuery.data, heroesQuery.data)
-      : []
+  const heroStats = useMemo(
+    () =>
+      statsQuery.data && heroesQuery.data
+        ? computeHeroStats(statsQuery.data, heroesQuery.data)
+        : [],
+    [statsQuery.data, heroesQuery.data],
+  )
 
   return { heroStats, isLoading, error, filters }
 }
