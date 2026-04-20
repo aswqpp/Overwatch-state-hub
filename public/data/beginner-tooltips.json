@@ -1,0 +1,22 @@
+{
+  "pickrate": {
+    "label": "픽률",
+    "description": "전체 게임에서 이 영웅이 선택된 비율. 높을수록 인기/범용성이 높다는 뜻."
+  },
+  "winrate": {
+    "label": "승률",
+    "description": "이 영웅을 픽한 게임의 승리 비율. 50%가 평균, 53% 이상이면 강한 영웅."
+  },
+  "metaScore": {
+    "label": "메타지수",
+    "description": "픽률 × 0.7 + 승률 × 0.3. 현재 얼마나 강한지 한 숫자로 요약."
+  },
+  "tier": {
+    "label": "등급",
+    "description": "S > A > B > C > D 순서로, 현재 메타에서의 강도를 나타냅니다. 퍼센타일 기반 자동 산정."
+  },
+  "metaConcentration": {
+    "label": "메타 집중도",
+    "description": "상위 3영웅이 전체 픽률에서 차지하는 비율. 높을수록 메타가 특정 영웅에 집중돼 있음."
+  }
+}

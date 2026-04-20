@@ -1,0 +1,39 @@
+{
+  "reaper": {
+    "combos": [
+      {
+        "name": "쉐도우 스텝 기습",
+        "steps": [
+          { "key": "E", "description": "쉐도우 스텝으로 기습 위치 이동" },
+          { "key": "LMB", "description": "근접 샷건 난사" },
+          { "key": "Shift", "description": "암흑 질주로 탈출" }
+        ]
+      }
+    ]
+  },
+  "ana": {
+    "combos": [
+      {
+        "name": "수면 + 궁 콤보",
+        "steps": [
+          { "key": "E", "description": "수면총으로 탱커 재우기" },
+          { "key": "Q", "description": "냐-니가 나노강화 주입 (아군에게)" },
+          { "key": "LMB", "description": "잠든 대상에게 집중 사격" }
+        ]
+      }
+    ]
+  },
+  "genji": {
+    "combos": [
+      {
+        "name": "드래곤 베기 콤보",
+        "steps": [
+          { "key": "Shift", "description": "질풍참으로 적에게 돌진" },
+          { "key": "Q", "description": "용검 발동" },
+          { "key": "LMB × 3", "description": "3단 베기로 적 처치" },
+          { "key": "E", "description": "편향으로 마무리 또는 탈출" }
+        ]
+      }
+    ]
+  }
+}
