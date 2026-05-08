@@ -1,6 +1,7 @@
-import { useT } from '@/i18n'
-import { metaConcentration } from '@/utils/meta'
-import type { HeroStat } from '@/types'
+import { useT, getHeroName } from '@/i18n'
+import { useUIStore } from '@/stores/uiStore'
+import { pickrateStdev, pickrateHistogram } from '@/utils/meta'
+import type { HeroStat, Language } from '@/types'
 
 interface Props {
   stats: HeroStat[]
@@ -47,15 +48,17 @@ function HeroCountCard({ stats }: { stats: HeroStat[] }) {
 // Card 2: Best meta score
 function BestMetaCard({ stats }: { stats: HeroStat[] }) {
   const t = useT()
+  const lang = useUIStore((s) => s.language) as Language
   const best = stats[0]
   if (!best) return <Card title={t('kpiBest')}><p style={{ color: 'var(--text-muted)' }}>—</p></Card>
+  const displayName = getHeroName(best.key, lang)
   return (
     <Card title={t('kpiBest')}>
       <div className="flex items-center gap-2">
         {best.portrait && (
           <img
             src={best.portrait}
-            alt={best.name}
+            alt={displayName}
             className="w-10 h-10 rounded-full object-cover"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
@@ -65,7 +68,7 @@ function BestMetaCard({ stats }: { stats: HeroStat[] }) {
             {best.meta.toFixed(2)}
           </p>
           <p className="text-xs font-medium" style={{ color: 'var(--text)' }}>
-            {best.name}
+            {displayName}
           </p>
         </div>
       </div>
@@ -76,15 +79,17 @@ function BestMetaCard({ stats }: { stats: HeroStat[] }) {
 // Card 3: Worst meta score
 function WorstMetaCard({ stats }: { stats: HeroStat[] }) {
   const t = useT()
+  const lang = useUIStore((s) => s.language) as Language
   const worst = stats[stats.length - 1]
   if (!worst) return <Card title={t('kpiWorst')}><p style={{ color: 'var(--text-muted)' }}>—</p></Card>
+  const displayName = getHeroName(worst.key, lang)
   return (
     <Card title={t('kpiWorst')}>
       <div className="flex items-center gap-2">
         {worst.portrait && (
           <img
             src={worst.portrait}
-            alt={worst.name}
+            alt={displayName}
             className="w-10 h-10 rounded-full object-cover"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
@@ -94,7 +99,7 @@ function WorstMetaCard({ stats }: { stats: HeroStat[] }) {
             {worst.meta.toFixed(2)}
           </p>
           <p className="text-xs font-medium" style={{ color: 'var(--text)' }}>
-            {worst.name}
+            {displayName}
           </p>
         </div>
       </div>
@@ -102,37 +107,44 @@ function WorstMetaCard({ stats }: { stats: HeroStat[] }) {
   )
 }
 
-// Card 4: Meta concentration
-function ConcentrationCard({ stats }: { stats: HeroStat[] }) {
+// Card 4: Pickrate stdev + mini histogram
+function PickrateStdevCard({ stats }: { stats: HeroStat[] }) {
   const t = useT()
-  const { pct, label, labelColor } = metaConcentration(stats)
-
-  const barFilled = Math.round((pct / 100) * 20)
-  const bar = Array.from({ length: 20 }, (_, i) => i < barFilled)
+  const sigma = pickrateStdev(stats)
+  const hist = pickrateHistogram(stats, 10)
+  const maxCount = Math.max(1, ...hist)
 
   return (
-    <Card title={t('kpiConcentration')}>
+    <Card title={t('kpiPickrateStdev')}>
       <div>
-        <p className="text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-          {t('top3Share')}{' '}
-          <span className="font-display font-bold text-xl tabular" style={{ color: 'var(--accent)' }}>
-            {pct}%
-          </span>
+        <p className="font-display font-bold text-3xl tabular" style={{ color: 'var(--accent)' }}>
+          σ = {sigma}
         </p>
 
-        {/* Mini distribution bar */}
-        <div className="flex gap-px my-2" aria-label={`메타 집중도 ${pct}%`}>
-          {bar.map((filled, i) => (
-            <div
-              key={i}
-              className="h-3 flex-1 rounded-sm"
-              style={{ backgroundColor: filled ? 'var(--accent)' : 'var(--border)' }}
-            />
-          ))}
+        <div
+          className="flex items-end gap-px h-8 mt-3"
+          aria-label={t('pickrateHistogramAria', { sigma: String(sigma) })}
+        >
+          {hist.map((count, i) => {
+            const h = Math.max(2, Math.round((count / maxCount) * 100))
+            return (
+              <div
+                key={i}
+                className="flex-1 rounded-sm"
+                style={{
+                  height: `${h}%`,
+                  backgroundColor: count > 0 ? 'var(--accent)' : 'var(--border)',
+                  opacity: count > 0 ? 0.6 + (count / maxCount) * 0.4 : 0.3,
+                }}
+                title={`${count}`}
+              />
+            )
+          })}
         </div>
 
-        <p className="text-xs font-semibold" style={{ color: labelColor }}>
-          {label}
+        <p className="text-[10px] mt-1 flex justify-between" style={{ color: 'var(--text-muted)' }}>
+          <span>{t('histogramLow')}</span>
+          <span>{t('histogramHigh')}</span>
         </p>
       </div>
     </Card>
@@ -145,7 +157,7 @@ export default function KpiCards({ stats }: Props) {
       <HeroCountCard stats={stats} />
       <BestMetaCard stats={stats} />
       <WorstMetaCard stats={stats} />
-      <ConcentrationCard stats={stats} />
+      <PickrateStdevCard stats={stats} />
     </div>
   )
 }

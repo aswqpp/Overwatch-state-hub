@@ -112,8 +112,15 @@ export default function FilterBar() {
 
         {/* Basis label */}
         <span className="ml-auto text-xs" style={{ color: 'var(--text-muted)' }}>
-          {region === 'asia' ? '아시아' : region === 'europe' ? '유럽' : '아메리카'}{' '}
-          {t('serverBasis')}
+          {t('serverBasisRegion', {
+            region: t(
+              region === 'asia'
+                ? 'regionAsia'
+                : region === 'europe'
+                  ? 'regionEurope'
+                  : 'regionAmericas',
+            ),
+          })}
         </span>
       </div>
     </div>

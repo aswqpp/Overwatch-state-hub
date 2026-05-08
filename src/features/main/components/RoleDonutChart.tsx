@@ -6,7 +6,6 @@ import {
   Legend,
 } from 'chart.js'
 import { useT } from '@/i18n'
-import type { HeroStat } from '@/types'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -16,23 +15,24 @@ const ROLE_COLORS = {
   support: '#4bcf7e',
 }
 
-interface Props {
-  stats: HeroStat[]
-}
+// Team-slot weights: tank 1 / damage 2 / support 2 = 20% / 40% / 40%
+const ROLE_SLOTS = { tank: 1, damage: 2, support: 2 } as const
+const TOTAL_SLOTS = ROLE_SLOTS.tank + ROLE_SLOTS.damage + ROLE_SLOTS.support
 
-export default function RoleDonutChart({ stats }: Props) {
+export default function RoleDonutChart() {
   const t = useT()
 
-  const pickByRole = { tank: 0, damage: 0, support: 0 }
-  for (const s of stats) {
-    pickByRole[s.role] = (pickByRole[s.role] ?? 0) + s.pickrate
+  const slotPct = {
+    tank: (ROLE_SLOTS.tank / TOTAL_SLOTS) * 100,
+    damage: (ROLE_SLOTS.damage / TOTAL_SLOTS) * 100,
+    support: (ROLE_SLOTS.support / TOTAL_SLOTS) * 100,
   }
 
   const data = {
     labels: [t('tank'), t('damage'), t('support')],
     datasets: [
       {
-        data: [pickByRole.tank, pickByRole.damage, pickByRole.support],
+        data: [slotPct.tank, slotPct.damage, slotPct.support],
         backgroundColor: [ROLE_COLORS.tank, ROLE_COLORS.damage, ROLE_COLORS.support],
         borderColor: 'transparent',
         borderWidth: 0,
@@ -68,9 +68,12 @@ export default function RoleDonutChart({ stats }: Props) {
       className="rounded-xl p-4"
       style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
     >
-      <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text)' }}>
+      <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text)' }}>
         {t('roleDistribution')}
       </h3>
+      <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
+        {t('roleSlotsNote')}
+      </p>
       <div className="max-w-[220px] mx-auto">
         <Doughnut data={data} options={options} />
       </div>

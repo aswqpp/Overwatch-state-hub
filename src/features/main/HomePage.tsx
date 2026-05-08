@@ -69,7 +69,7 @@ export default function HomePage() {
           <KpiCards stats={heroStats} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <RoleDonutChart stats={heroStats} />
+            <RoleDonutChart />
             <Top10BarChart stats={heroStats} />
           </div>
 
@@ -77,7 +77,7 @@ export default function HomePage() {
 
           {/* Data disclaimer */}
           <p className="text-xs text-center pb-2" style={{ color: 'var(--text-muted)' }}>
-            ⚠️ {t('disclaimer')} 데이터 출처: OverFast API (비공식) — 블리자드 공식 서비스 아님
+            {t('disclaimerIcon')} {t('disclaimer')} {t('homeFooterSource')}
           </p>
         </div>
       )}

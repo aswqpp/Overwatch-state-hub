@@ -1,12 +1,13 @@
 import { useUIStore, applyTheme } from '@/stores/uiStore'
 import { useSnapshotStore } from '@/stores/snapshotStore'
+import { useT } from '@/i18n'
 import PageLayout from '@/components/layout/PageLayout'
 import type { Theme, Language } from '@/types'
 
-const THEMES: { value: Theme; label: string }[] = [
-  { value: 'dark', label: '다크' },
-  { value: 'light', label: '라이트' },
-  { value: 'system', label: '시스템' },
+const THEMES: { value: Theme; labelKey: 'themeDark' | 'themeLight' | 'themeSystem' }[] = [
+  { value: 'dark', labelKey: 'themeDark' },
+  { value: 'light', labelKey: 'themeLight' },
+  { value: 'system', labelKey: 'themeSystem' },
 ]
 
 const LANGUAGES: { value: Language; label: string }[] = [
@@ -16,13 +17,14 @@ const LANGUAGES: { value: Language; label: string }[] = [
 ]
 
 export default function SettingsPage() {
+  const t = useT()
   const { theme, language, setTheme, setLanguage } = useUIStore()
   const { snapshots, autoSave, setAutoSave, clearSnapshots, exportSnapshots, importSnapshots } =
     useSnapshotStore()
 
-  function handleTheme(t: Theme) {
-    setTheme(t)
-    applyTheme(t)
+  function handleTheme(th: Theme) {
+    setTheme(th)
+    applyTheme(th)
   }
 
   function handleExport() {
@@ -47,7 +49,7 @@ export default function SettingsPage() {
   }
 
   function handleClear() {
-    if (confirm(`스냅샷 ${snapshots.length}개를 모두 삭제하시겠습니까?`)) {
+    if (confirm(t('snapshotClearConfirm', { count: String(snapshots.length) }))) {
       clearSnapshots()
     }
   }
@@ -62,15 +64,15 @@ export default function SettingsPage() {
   return (
     <PageLayout>
       <h1 className="font-display font-bold text-2xl mb-6" style={{ color: 'var(--text)' }}>
-        ⚙️ 설정
+        ⚙️ {t('settingsTitle')}
       </h1>
 
       <div className="flex flex-col gap-4 max-w-xl">
         {/* Theme */}
         <section className={sectionClass} style={sectionStyle}>
-          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>테마</h2>
+          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{t('themeSection')}</h2>
           <div className={btnGroupClass}>
-            {THEMES.map(({ value, label }) => (
+            {THEMES.map(({ value, labelKey }) => (
               <button
                 key={value}
                 onClick={() => handleTheme(value)}
@@ -81,7 +83,7 @@ export default function SettingsPage() {
                   color: theme === value ? '#000' : 'var(--text)',
                 }}
               >
-                {label}
+                {t(labelKey)}
               </button>
             ))}
           </div>
@@ -89,7 +91,7 @@ export default function SettingsPage() {
 
         {/* Language */}
         <section className={sectionClass} style={sectionStyle}>
-          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>언어</h2>
+          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{t('languageSection')}</h2>
           <div className={btnGroupClass}>
             {LANGUAGES.map(({ value, label }) => (
               <button
@@ -110,11 +112,11 @@ export default function SettingsPage() {
 
         {/* Snapshot */}
         <section className={sectionClass} style={sectionStyle}>
-          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>스냅샷 데이터</h2>
+          <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{t('snapshotSection')}</h2>
 
           <div className="flex items-center justify-between">
             <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              자동 저장
+              {t('snapshotAutoSave')}
             </span>
             <button
               onClick={() => setAutoSave(!autoSave)}
@@ -131,8 +133,7 @@ export default function SettingsPage() {
           </div>
 
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            저장된 스냅샷: <strong style={{ color: 'var(--text)' }}>{snapshots.length}</strong>개
-            (최대 180개)
+            {t('snapshotCount', { count: String(snapshots.length) })}
           </p>
 
           <div className={btnGroupClass}>
@@ -147,7 +148,7 @@ export default function SettingsPage() {
                 opacity: snapshots.length === 0 ? 0.5 : 1,
               }}
             >
-              📥 내보내기
+              📥 {t('snapshotExport')}
             </button>
 
             <label
@@ -158,7 +159,7 @@ export default function SettingsPage() {
                 color: 'var(--text)',
               }}
             >
-              📤 가져오기
+              📤 {t('snapshotImport')}
               <input type="file" accept=".json" onChange={handleImport} className="hidden" />
             </label>
 
@@ -173,16 +174,14 @@ export default function SettingsPage() {
                 opacity: snapshots.length === 0 ? 0.5 : 1,
               }}
             >
-              🗑️ 전체 삭제
+              🗑️ {t('snapshotClear')}
             </button>
           </div>
         </section>
 
         {/* Data disclaimer */}
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          ⚠️ 이 사이트는 <strong>OverFast API (비공식)</strong>를 사용합니다. 블리자드 공식
-          서비스가 아니며 중단될 수 있습니다. 데이터는 선택된 지역 하나 기준이며, "글로벌"
-          통계를 제공하지 않습니다.
+          {t('disclaimerIcon')} {t('dataDisclaimer')}
         </p>
       </div>
     </PageLayout>

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Navbar from '@/components/layout/Navbar'
 import FilterBar from '@/components/layout/FilterBar'
 import ErrorBoundary from '@/components/layout/ErrorBoundary'
+import { useT } from '@/i18n'
 import HomePage from '@/features/main/HomePage'
 import MapPage from '@/features/map/MapPage'
 import HeroesPage from '@/features/heroes/HeroesPage'
@@ -22,6 +23,18 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+function AppFooter() {
+  const t = useT()
+  return (
+    <footer
+      className="mt-auto px-4 py-3 text-center text-xs"
+      style={{ color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}
+    >
+      {t('appFooter')}
+    </footer>
+  )
+}
 
 export default function App() {
   return (
@@ -44,13 +57,7 @@ export default function App() {
             </Routes>
           </ErrorBoundary>
 
-          {/* Footer */}
-          <footer
-            className="mt-auto px-4 py-3 text-center text-xs"
-            style={{ color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}
-          >
-            Overwatch Meta Hub · 데이터: OverFast API (비공식) · 블리자드 공식 서비스 아님
-          </footer>
+          <AppFooter />
         </div>
       </BrowserRouter>
     </QueryClientProvider>

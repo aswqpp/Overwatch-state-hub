@@ -1,12 +1,14 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { useT } from '@/i18n'
 
 export default function TierlistPage() {
+  const t = useT()
   return (
     <PageLayout>
       <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}>
         <p className="text-4xl mb-4">🏆</p>
-        <p className="font-semibold text-lg mb-1" style={{ color: 'var(--text)' }}>자동 티어리스트</p>
-        <p className="text-sm">Phase 5에서 구현 예정</p>
+        <p className="font-semibold text-lg mb-1" style={{ color: 'var(--text)' }}>{t('tierlist')}</p>
+        <p className="text-sm">{t('comingSoon', { phase: t('phase5') })}</p>
       </div>
     </PageLayout>
   )

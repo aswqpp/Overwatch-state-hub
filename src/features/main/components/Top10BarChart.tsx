@@ -7,9 +7,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import { useT } from '@/i18n'
+import { useT, getHeroName } from '@/i18n'
 import { useUIStore } from '@/stores/uiStore'
-import type { HeroStat } from '@/types'
+import type { HeroStat, Language } from '@/types'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
@@ -25,10 +25,10 @@ interface Props {
 
 export default function Top10BarChart({ stats }: Props) {
   const t = useT()
-  const lang = useUIStore((s) => s.language)
+  const lang = useUIStore((s) => s.language) as Language
   const top10 = stats.slice(0, 10)
 
-  const labels = top10.map((s) => s.name)
+  const labels = top10.map((s) => getHeroName(s.key, lang))
   const metaData = top10.map((s) => s.meta)
   const bgColors = top10.map((s) => ROLE_COLORS[s.role])
 
@@ -68,9 +68,6 @@ export default function Top10BarChart({ stats }: Props) {
       },
     },
   }
-
-  // Suppress unused warning
-  void lang
 
   return (
     <div

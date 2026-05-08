@@ -72,14 +72,14 @@ export default function Navbar() {
           <button
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors hover:bg-[var(--card)] text-[var(--text-muted)]"
-            aria-label="테마 전환"
+            aria-label={t('themeToggleAria')}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           <NavLink
             to="/settings"
             className="w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors hover:bg-[var(--card)] text-[var(--text-muted)]"
-            aria-label="설정"
+            aria-label={t('settingsAria')}
           >
             ⚙️
           </NavLink>

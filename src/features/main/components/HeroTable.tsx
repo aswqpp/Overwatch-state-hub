@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useT } from '@/i18n'
+import { useT, getHeroName } from '@/i18n'
+import { useUIStore } from '@/stores/uiStore'
 import { sortHeroStats } from '@/utils/meta'
 import TierBadge from '@/components/ui/TierBadge'
 import RoleBadge from '@/components/ui/RoleBadge'
-import type { HeroStat, HeroRole } from '@/types'
+import type { HeroStat, HeroRole, Language } from '@/types'
 import type { SortKey } from '@/utils/meta'
 
 interface Props {
@@ -22,6 +23,7 @@ const ROLE_FILTERS: { value: '' | HeroRole; label: string }[] = [
 
 export default function HeroTable({ stats }: Props) {
   const t = useT()
+  const lang = useUIStore((s) => s.language) as Language
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')
@@ -34,12 +36,17 @@ export default function HeroTable({ stats }: Props) {
     if (roleFilter) result = result.filter((s) => s.role === roleFilter)
     if (search) {
       const q = search.toLowerCase()
-      result = result.filter(
-        (s) => s.name.toLowerCase().includes(q) || s.key.toLowerCase().includes(q),
-      )
+      result = result.filter((s) => {
+        const localized = getHeroName(s.key, lang).toLowerCase()
+        return (
+          localized.includes(q) ||
+          s.name.toLowerCase().includes(q) ||
+          s.key.toLowerCase().includes(q)
+        )
+      })
     }
     return sortHeroStats(result, sortKey, sortDir === 'asc')
-  }, [stats, roleFilter, search, sortKey, sortDir])
+  }, [stats, roleFilter, search, sortKey, sortDir, lang])
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -142,7 +149,9 @@ export default function HeroTable({ stats }: Props) {
                 </td>
               </tr>
             )}
-            {filtered.map((hero, idx) => (
+            {filtered.map((hero, idx) => {
+              const displayName = getHeroName(hero.key, lang)
+              return (
               <tr
                 key={hero.key}
                 onClick={() => navigate(`/heroes/${hero.key}`)}
@@ -164,7 +173,7 @@ export default function HeroTable({ stats }: Props) {
                     {hero.portrait ? (
                       <img
                         src={hero.portrait}
-                        alt={hero.name}
+                        alt={displayName}
                         className="w-8 h-8 rounded-full object-cover shrink-0"
                         onError={(e) => { e.currentTarget.style.display = 'none' }}
                       />
@@ -175,7 +184,7 @@ export default function HeroTable({ stats }: Props) {
                       />
                     )}
                     <span className="font-medium" style={{ color: 'var(--text)' }}>
-                      {hero.name}
+                      {displayName}
                     </span>
                   </div>
                 </td>
@@ -198,7 +207,8 @@ export default function HeroTable({ stats }: Props) {
                   <TierBadge tier={hero.tier} />
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
       </div>

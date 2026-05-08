@@ -56,36 +56,27 @@ export function computeHeroStats(
     .sort((a, b) => b.meta - a.meta)
 }
 
-// Meta concentration: top-3 pick share
-export function metaConcentration(stats: HeroStat[]): {
-  pct: number
-  label: string
-  labelColor: string
-} {
-  if (!stats.length) return { pct: 0, label: '데이터 없음', labelColor: '#90a4ae' }
+// Pickrate standard deviation — how concentrated the meta is (lower = more balanced)
+export function pickrateStdev(stats: HeroStat[]): number {
+  if (!stats.length) return 0
+  const picks = stats.map((h) => h.pickrate)
+  const mean = picks.reduce((a, b) => a + b, 0) / picks.length
+  const variance = picks.reduce((sum, p) => sum + (p - mean) ** 2, 0) / picks.length
+  return +Math.sqrt(variance).toFixed(2)
+}
 
-  const sorted = [...stats].sort((a, b) => b.pickrate - a.pickrate)
-  const total = sorted.reduce((s, h) => s + h.pickrate, 0)
-  const top3 = sorted.slice(0, 3).reduce((s, h) => s + h.pickrate, 0)
-  const pct = total > 0 ? +((top3 / total) * 100).toFixed(1) : 0
-
-  let label: string
-  let labelColor: string
-  if (pct > 50) {
-    label = '매우 집중됨 🔴'
-    labelColor = '#ef4444'
-  } else if (pct > 35) {
-    label = '집중됨 ⚠️'
-    labelColor = '#f59e0b'
-  } else if (pct > 20) {
-    label = '균형잡힘 ✓'
-    labelColor = '#10b981'
-  } else {
-    label = '매우 균형잡힘 🟢'
-    labelColor = '#4bcf7e'
+// Pickrate histogram — bucket counts across pickrate range, for mini sparkline
+export function pickrateHistogram(stats: HeroStat[], buckets = 10): number[] {
+  const counts = Array.from({ length: buckets }, () => 0)
+  if (!stats.length) return counts
+  const picks = stats.map((h) => h.pickrate)
+  const max = Math.max(...picks)
+  if (max <= 0) return counts
+  for (const p of picks) {
+    const idx = Math.min(buckets - 1, Math.floor((p / max) * buckets))
+    counts[idx] += 1
   }
-
-  return { pct, label, labelColor }
+  return counts
 }
 
 export type SortKey = 'meta' | 'pickrate' | 'winrate'
